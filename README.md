@@ -5,6 +5,7 @@ For Data Tidying Course
 
 dplyr
 ggplot2
+httr
 janitor
 skimr
 tidyr
