@@ -1,0 +1,48 @@
+---
+title: "Saving Plots"
+author: "James Cantonwine"
+date: "7/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Image Types
+
+* JPEG - takes up less space, will lose quality with each save, have a white background by default
+* PNG - takes up more space, preserves quality, has a transparent background by default, may show pixels when magnified
+* TIFF - takes up more space, preserves quality, can be edited easily
+* PDF - works well with multiple images per file, prints well and consistently, can scale without pixelation
+
+## Saving with ggsave
+
+The `ggsave()` function allows for files to be saved in mutiple file types and in specified locations as below:
+```{r}
+## generate plot
+myplot <- ggplot(data = mtcars) + geom_point(mapping = aes(x = wt, y = mpg))
+
+## save plot as PNG
+ggsave(plot = myplot, filename = "myplot.png", path = "figures/exploratory_figures")
+
+## save plot as JPEG
+ggsave(plot = myplot, filename = "myplot.jpeg", path = "figures/exploratory_figures")
+```
+
+The `ggsave()` function can also be used to specify image dimensions. This code will overwrite the prior PNG image and save a version with an increased size:
+```{r}
+## save plot as larger PNG
+ggsave(plot = myplot, filename = "myplot.png", path = "figures/exploratory_figures", height = 9, width = 9, unit = c("in"))
+```
+
+## Alternatives
+
+Specific functions to save exist for different file types and can be used if `ggsave()` presents any issues. Thes include `png()`, `jpeg()`, `pdf()`, and `tiff()`. Specify the save path within the function, use `print`, and then end with `dev.off()` as shown below:
+```{r}
+jpeg("figures/exploratory_figures/myplot.jpeg")
+print(myplot)
+dev.off()
+```
+

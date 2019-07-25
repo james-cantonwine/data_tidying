@@ -16,3 +16,18 @@ library(janitor)
 
 install.packages("httr")
 library(httr)
+
+install.packages("readr")
+library(readr)
+
+install.packages("stringr")
+library(stringr)
+
+install.packages("htmlwidgets")
+library(htmlwidgets)
+
+install.packages("forcats")
+library(forcats)
+
+install.packages('lubridate')
+library(lubridate)

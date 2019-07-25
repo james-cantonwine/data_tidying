@@ -1,0 +1,74 @@
+---
+title: "Data Visualization - Basics of ggplot2"
+author: "James Cantonwine"
+date: "7/19/2019"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## General form of plots with ggplot2:
+ggplot(data = DATASET) + 
+  geom_PLOT_TYPE(mapping = aes(VARIABLE(S)))
+
+## Scatterplots with geom_point()
+
+### A basic plot with the diamonds dataset
+```{r}
+## The function geom_point plots points for a scatterplot
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
+```
+
+### Mapping point color to a variable
+```{r}
+## Putting color as a variable within aes maps it to a variable
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, color = clarity))
+```
+
+### Manually specifying a point color
+```{r}
+## Here the color is specified outside of the aesthetic function and applied to all points
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price), color = "red")
+```
+
+We can also use **size** and **shape** as specifications in the same way - inside aes() when mapped to a variable and outside it when applied to the entire plot. There are 25 different shapes available for specification.
+
+## Using facets to categorize data
+```{r}
+## The tilde is read as "by" - that variable used to group the data into facets
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price)) + 
+  facet_wrap(~clarity, nrow = 2)
+```
+
+## Additional geom_ functions
+
+### geom_histogram
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping =  aes(carat))
+```
+
+This can be used to help verify assumptions about frequency, as points on a scatterplot may stack or overlap.
+
+### geom_bar
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(cut))
+```
+
+This allows for comparison of a set of numbers and a categorical variable.
+
+### geom_boxplot
+```{r}
+ggplot(data = diamonds) + 
+  geom_boxplot(aes(x = color, y = price))
+```
+

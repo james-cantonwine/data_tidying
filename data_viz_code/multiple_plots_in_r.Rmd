@@ -1,0 +1,77 @@
+---
+title: "Multiple Plots in R"
+author: "James Cantonwine"
+date: "7/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Installing patchwork
+
+These examples will use the `patchwork` package. Because `patchwork` is not on the CRAN database, installation follows a different procedure:
+```{r, message=FALSE}
+install.packages("devtools")
+
+library(devtools)
+devtools::install_github("thomasp85/patchwork")
+```
+
+More information about `patchwork` can be found on the [Patchwork GitHub](https://github.com/thomasp85/patchwork).
+
+## Basic plotting using patchwork
+
+After creating two plots, `patchwork` allows for these to be combined using a `+` operator:
+```{r, message=FALSE}
+library(ggplot2)
+library(patchwork)
+
+p1 <- ggplot(mtcars) + geom_point(aes(wt, mpg))
+p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, mpg, group = gear))
+
+p1 + p2
+```
+
+## Altering the layout
+
+The `plot_layout()` function allows for the specification of the number of columns or rows with `ncol = ` and `nrow = ` respectively:
+```{r, message=FALSE}
+p1 + p2 + plot_layout(ncol = 1)
+```
+
+The `heights` argument allows for control of the height of each plot. In the example below, the first plot will be 3 times the height of the second:
+```{r, message=FALSE}
+p1 + p2 + plot_layout(ncol = 1, heights = c(3, 1))
+```
+
+Nested plots can also be created using `patchwork` through brackets:
+```{r, message=FALSE}
+p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
+p4 <- ggplot(mtcars) + geom_bar(aes(carb))
+
+p4 + (
+  p1 + (
+    p2 +
+    p3 +
+    plot_layout(ncol = 1)
+  )
+) +
+  plot_layout(ncol = 1)
+```
+
+## Additional operators
+
+Using `|` will always add plots together from left to right, while `/` will stack plots on top of one another:
+```{r, message=FALSE}
+(p1 | p2 | p3) / p4
+```
+
+Using `&` will apply a theme to all plots, while `*` will only apply the theme to plots in that nesting level:
+```{r, message=FALSE}
+p1 + (p2 + p3) + p4 + plot_layout(ncol = 1) & theme_bw()
+
+(p1 + (p2 + p3) + p4 + plot_layout(ncol = 1)) * theme_bw()
+```

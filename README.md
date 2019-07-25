@@ -7,5 +7,6 @@ dplyr
 ggplot2
 httr
 janitor
+readr
 skimr
 tidyr

@@ -1,0 +1,69 @@
+---
+title: "Tables in R"
+author: "James Cantonwine"
+date: "7/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+```
+
+## Exploratory tables
+
+This code establishes a new dataframe `df` from the `diamonds` dataset. `df` groups the data by the quality of the cut (`cut`) and uses a `dplyr` function to summarize the data. The summary will include the number of diamonds in each group as well as the minimum, mean, and maximum prices within each group.
+
+```{r}
+df <- diamonds %>% 
+  group_by(cut) %>%
+  dplyr::summarize(
+    N = n(), 
+    min = min(price), 
+    avg = mean(price), 
+    max = max(price)
+  )
+df
+```
+
+Good qualities of this table include:
+* A reasonable number of rows and columns for understanding
+* The first column `cut` is organized logically from lowest to highest quality
+* Comparisons within the data are made vertically
+
+A few changes would improve this table from exploratory to explanatory:
+* The column headers could be more clear
+* The table should have a title or caption
+* It could be more aesthetically pleasing
+
+## Improving table outputs
+
+By default R uses a monospaced font for displaying outputs. Using the `kable()` function from the `knitr` package improves readability in both the console and in Markdown.
+```{r}
+library(knitr)
+kable(df)
+```
+
+The `add_header_above` function within the `kableExtra` package can specify that the three price columns all refer to US dollars. We can also  use `digits` to specify the number of significant digits we want the output to display. To further improve readability, we will use `kable_styling()` to shade alternate rows.
+```{r}
+library(kableExtra)
+kable(df, digits = 0, "html") %>%
+  kable_styling("striped", "bordered") %>%
+  add_header_above(c(" " = 2, "price (USD)" = 3))
+```
+
+## Annotating a table
+
+The `kable` package allows for a `caption` argument. `kableExtra` also has a `footnote()` function that can be used to include text at the bottom of the table - generally the source of the data.
+```{r}
+kable(df, digits=0, "html", caption="Table 1: Diamonds Price by Quality of Cut. Most\
+ Diamonds are of the highest quality cut and the most expensive diamonds are of the \
+highest quality") %>%
+  kable_styling("striped", "bordered") %>% 
+  add_header_above(c(" " = 2,  "price (USD)" = 3)) %>% 
+  footnote(general="Diamonds dataset from ggplot2", general_title="Source:",footnote_as_chunk = T)
+```
+

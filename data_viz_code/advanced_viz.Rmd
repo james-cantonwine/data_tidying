@@ -1,0 +1,70 @@
+---
+title: "Advanced Data Visualization"
+author: "James Cantonwine"
+date: "7/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## plotly
+
+### Interactive plots
+
+`plotly` is a package for translating `ggplot2` graphs into interactive or custom web-based visualizations. Once a plot has been created and edited within `gplot`, using the function `ggplotly()` will create an interactive plot:
+```{r}
+## Load libraries
+library(ggplot2)
+library(plotly)
+
+## Generate ggplot object
+p <- ggplot(iris, aes(x = factor(Species), y = Petal.Length, color = Petal.Width)) +
+  geom_boxplot() +
+  geom_point()
+
+## Generate interactive graphic
+p <- ggplotly(p)
+p
+```
+
+The [plotly docmentation](https://plotly-r.com/) will be a helpful resource.
+
+### Animated plots
+
+Plots can be animated by specifying the `frame` argument. This example uses data from the `gapminder` package. Because the frame argument is set to `year`, the plot will cycle through years available within the data set.
+```{r, message=FALSE}
+## install the package 
+install.packages("gapminder")
+
+## get the data
+data(gapminder, package = "gapminder")
+
+## generate ggplot object
+gg <- ggplot(gapminder, aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point(aes(frame = year, ids = country)) +
+  scale_x_log10()
+
+## plot animated graphic
+ggplotly(gg)
+```
+
+Objects created with `plotly` can be printed into .Rmd as long as the document knits to HTML. If a `plotly` is knit into a non-HTML format, it will print as a static .png screenshot.
+
+## gganimate
+
+There are other packages that can generate animated graphics. One advantage to using `gganimate` is that the output can be direct to a .gif, .mp4, .swf, or .html object. 
+
+**The version of gganimate used here refers to an older API and will not work properly: either the version of gganimate needs to be downgraded or the code updated.**
+```{r, message=FALSE}
+## download and load gganimate 
+devtools::install_github("dgrtwo/gganimate")
+library(gganimate)
+
+## plot animated graphic using gganimate
+gganimate(gg)
+
+## to save this plot
+gganimate(gg, "output.gif")
+```

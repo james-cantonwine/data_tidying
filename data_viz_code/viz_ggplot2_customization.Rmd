@@ -1,0 +1,203 @@
+---
+title: "Data Visualization - Customization with ggplot2"
+author: "James Cantonwine"
+date: "7/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Customization
+
+### Review: Using ggplot2 to map color to a variable automatically:
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, color = clarity))
+```
+
+### Color on bar plots
+
+Why we don't use `color = ` on bar plots:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, color = clarity))
+```
+
+Color is only added to the outside lines of the bars - not very helpful!
+
+Instead, we use `fill = ` for bar plots and histograms:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = clarity))
+```
+
+Assigning to fill to a second variable allows for counts *within* each bar as a stacked bar chart: 
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = clarity, fill = cut))
+```
+
+This will be helpful for making plots of performance level trends over time.
+
+
+Because some colors might be more helpful to see than others (i.e. yellow often doesn't project well), we can also specify colors to use within a variable:
+```{r}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = clarity, fill = cut)) +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4"))
+```
+
+A full list of colors can be found on the third page of [this cheatsheet](https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf)
+
+### Position adjustments with bar charts
+
+Mapping position to `fill = ` allows us to better compare the *proportions* of the variable within a bar (cut in this case) to other bars:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "fill") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4"))
+```
+
+Using `position = dodge` will place charts next to each other:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "dodge") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4"))
+```
+
+This view makes comparisons across groups more difficult but emphasizes scale much more clearly.
+
+## Adding text to plots
+
+### Titles
+
+Titles, subtitles, and captions can be added with the `labs()` function:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "fill") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4")) +
+  labs( title = "Clearer diamonds tend to be of higher quality cut",
+        subtitle = "The majority of IF diamonds are an \"Ideal\" cut")
+```
+
+### Themes
+
+Here we are going to edit the y-axis label to be more accurate and alter all of the the text to be larger.
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "fill") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4")) +
+  labs( title = "Clearer diamonds tend to be of higher quality cut",
+        subtitle = "The majority of IF diamonds are an \"Ideal\" cut") +
+  ylab("proportion") +
+  theme_classic() +
+  theme( title = element_text(size = 18), 
+         axis.text = element_text(size =14),
+         axis.title = element_text(size = 16),
+         legend.text = element_text(size = 14) )
+```
+
+We can alter the same element in multiple ways using commas to separate the arguments:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "fill") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4")) +
+  labs( title = "Clearer diamonds tend to be of higher quality cut",
+        subtitle = "The majority of IF diamonds are an \"Ideal\" cut") +
+  ylab("proportion") +
+  theme_classic() +
+  theme( title = element_text(size = 18), 
+         axis.text = element_text(size = 14),
+         axis.title = element_text(size = 16, face = "bold"),
+         legend.text = element_text(size = 14),
+         plot.subtitle = element_text(color = "gray30"))
+```
+
+Look to using `?theme` within the console to investigate more options.
+
+### Legends
+
+In this case, the label on the legend is probably misleading. People generally think of 'cut' as referencing the shape of a diamond, but the data is actually about how well that cut was executed. We can change the text on the legend without changing the data by using the guide() function after the theme:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity, fill = cut), position = "fill") +
+  scale_fill_manual(values = c("red", "orange", "darkgreen", "dodgerblue", "purple4")) +
+  labs( title = "Clearer diamonds tend to be of higher quality cut",
+        subtitle = "The majority of IF diamonds are an \"Ideal\" cut") +
+  ylab("proportion") +
+  theme_classic() +
+  theme( title = element_text(size = 18), 
+         axis.text = element_text(size = 14),
+         axis.title = element_text(size = 16, face = "bold"),
+         legend.text = element_text(size = 14),
+         plot.subtitle = element_text(color = "gray30") ) +
+  guides(fill = guide_legend("cut quality"))
+```
+
+### Scales
+
+For continuous (i.e. numeric) variables, we can use `scale_x_continuous` or `scale_y_continuous` to adjust the scale of the graph:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity)) +
+  scale_y_continuous(breaks = seq(0, 17000, by = 1000))
+```
+
+For discrete variables (e.g. factors or categorical variables), we can use `scale_x_discrete` or `scale_y_discrete`. The example below uses scale_x_discrete to focus on only three columns of data: 
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity)) +
+  scale_x_discrete(limit = c("SI2", "SI1", "I1")) +
+  scale_y_continuous(breaks = seq(0, 17000, by = 1000)) 
+```
+
+To switch axes, use `coord_flip()`:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity)) +
+  scale_y_continuous(breaks = seq(0, 15000, by = 2000)) +
+  scale_x_discrete(limit = c("SI2", "SI1", "I1")) +
+  coord_flip() +
+  labs( title = "Clearer diamonds tend to be of higher quality cut",
+        subtitle = "The majority of IF diamonds are an \"Ideal\" cut") +
+  ylab("proportion") +
+  theme_classic() +
+  theme( title = element_text(size = 18), 
+         axis.text = element_text(size = 14),
+         axis.title = element_text(size = 16, face = "bold"),
+         legend.text = element_text(size = 14),
+         plot.subtitle = element_text(color = "gray30") ) +
+  guides(fill = guide_legend("cut quality")) 
+```
+
+Being able to adjust this with a single line of code, rather than editing the variables, will save time when trying to iterate and improve a plot.
+
+### Annotations
+
+We can add text as its own 'geom' layer using the `annotate()` function. The text itself is specified with `label = `, the position is specified with `x = ` and `y = ` coordinates, and the text alignment can be specied with `hjust` and/or `vjust`:
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = clarity)) +
+  scale_y_continuous(breaks = seq(0, 15000, by = 2000)) +
+  scale_x_discrete(limit = c("SI2", "SI1", "I1")) +
+  coord_flip() +
+  labs( title = "Number of diamonds by diamond clarity",
+        subtitle = "Subset of all diamonds, looking three levels of clarity") +
+  theme_classic() +
+  theme( title = element_text(size = 18), 
+         axis.text = element_text(size = 14),
+         axis.title = element_text(size = 16, face = "bold"),
+         legend.text = element_text(size = 14),
+         plot.subtitle = element_text(color = "gray30") ) +
+  annotate("text", label = "SI1 diamonds are among the\n most frequent clarity diamond", 
+           y = 12800, x = 3, 
+           vjust = "top", hjust = "right", 
+           size = 6)
+```
+
+There's a lot to fiddle within in terms of placement especially - likely a place to plan spending time when creating plots for presenting or sharing.
+
+Further annotation resources, including using `geom_text` and labeling points can be found [here](https://r4ds.had.co.nz/graphics-for-communication.html#annotations).
