@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Interactive plots
 
 `plotly` is a package for translating `ggplot2` graphs into interactive or custom web-based visualizations. Once a plot has been created and edited within `gplot`, using the function `ggplotly()` will create an interactive plot:
-```{r}
+```{r, message=FALSE}
 ## Load libraries
 library(ggplot2)
 library(plotly)
@@ -29,7 +29,7 @@ p <- ggplotly(p)
 p
 ```
 
-The [plotly docmentation](https://plotly-r.com/) will be a helpful resource.
+The [plotly documentation](https://plotly-r.com/) will be a helpful resource.
 
 ### Animated plots
 
@@ -57,14 +57,3 @@ Objects created with `plotly` can be printed into .Rmd as long as the document k
 There are other packages that can generate animated graphics. One advantage to using `gganimate` is that the output can be direct to a .gif, .mp4, .swf, or .html object. 
 
 **The version of gganimate used here refers to an older API and will not work properly: either the version of gganimate needs to be downgraded or the code updated.**
-```{r, message=FALSE}
-## download and load gganimate 
-devtools::install_github("dgrtwo/gganimate")
-library(gganimate)
-
-## plot animated graphic using gganimate
-gganimate(gg)
-
-## to save this plot
-gganimate(gg, "output.gif")
-```
